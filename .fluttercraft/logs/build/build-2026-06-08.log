@@ -1,0 +1,75 @@
+════════════════════════════════════════════════════════════════
+  fluttercraft CLI - BUILD Session
+  Build ID: 20260608-012129-3888
+  Started: 2026-06-08 01:21:29.773212
+  Version: 1.0.0+1
+════════════════════════════════════════════════════════════════
+[01:21:29] [INFO] Build started
+[01:21:29] [INFO] Build ID: 20260608-012129-3888
+
+────────────────────────────────────────────────────────────
+  Build Configuration
+────────────────────────────────────────────────────────────
+
+[01:21:29] [INFO] App Name: pomo
+[01:21:29] [INFO] Version: 1.0.0+1
+[01:21:29] [INFO] Platform: APK
+[01:21:29] [INFO] Flavor: (none)
+[01:21:29] [INFO] Target: lib/main.dart
+[01:21:29] [INFO] Output Path: C:\Users\Windows10\Desktop\ДП Рубцов Погорелова\student-todo-timemanagement-main\.fluttercraft/dist
+
+────────────────────────────────────────────────────────────
+  Build Flags
+────────────────────────────────────────────────────────────
+
+[01:21:29] [INFO] Prompt Dart Define: false
+[01:21:29] [INFO] Should Clean: false
+[01:21:29] [INFO] Should Build Runner: false
+
+────────────────────────────────────────────────────────────
+  Integrations
+────────────────────────────────────────────────────────────
+
+[01:21:29] [INFO] Use FVM: false
+[01:21:29] [INFO] Flutter Version: (auto)
+[01:21:29] [INFO] Use Shorebird: false
+[01:21:29] [INFO] Shorebird Artifact: (default)
+[01:21:29] [INFO] Shorebird Auto Confirm: true
+
+────────────────────────────────────────────────────────────
+  Debug: Command Generation
+────────────────────────────────────────────────────────────
+
+[01:21:29] [INFO] buildConfig.finalDartDefineFromFile = null
+[01:21:29] [INFO] buildConfig.dartDefineFromFile = null
+[01:21:29] [INFO] buildConfig.globalDartDefineFromFile = null
+
+────────────────────────────────────────────────────────────
+  Build Command
+────────────────────────────────────────────────────────────
+
+[01:21:29] [INFO] Command: flutter build apk --release --build-name=1.0.0 --build-number=1
+
+────────────────────────────────────────────────────────────
+  Building APK
+────────────────────────────────────────────────────────────
+
+
+────────────────────────────────────────────────────────────
+  Executing Build Command
+────────────────────────────────────────────────────────────
+
+[01:22:35] [INFO] Command: flutter build apk --release --build-name=1.0.0 --build-number=1
+
+────────────────────────────────────────────────────────────
+  Build Errors/Warnings
+────────────────────────────────────────────────────────────
+
+[01:22:38] [OUT] [!] No Android SDK found. Try setting the ANDROID_HOME environment variable.
+[01:22:38] [ERROR] Build failed with exit code: 1
+  Result: FAILED
+  Ended: 2026-06-08 01:22:38.770866
+  Duration: 3s
+  
+════════════════════════════════════════════════════════════════
+
