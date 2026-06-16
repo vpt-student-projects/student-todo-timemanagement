@@ -89,8 +89,6 @@ class _TimerScreenState extends State<TimerScreen> with TickerProviderStateMixin
             widget.onPomodoroCompleted();
             widget.onFocusTimeAdded(_elapsedSeconds);
             _elapsedSeconds = 0;
-            
-            // Эффект вибрации при завершении
           }
           _isWorkTime = !_isWorkTime;
           _seconds = _isWorkTime ? 25 * 60 : 5 * 60;
@@ -107,9 +105,6 @@ class _TimerScreenState extends State<TimerScreen> with TickerProviderStateMixin
     setState(() {
       _isRunning = !_isRunning;
     });
-    if (_isRunning) {
-      // Легкая пульсация при запуске
-    }
   }
 
   void _resetTimer() {
@@ -157,7 +152,7 @@ class _TimerScreenState extends State<TimerScreen> with TickerProviderStateMixin
       ),
       child: Column(
         children: [
-          // Стильный дропдаун для выбора задачи
+          // Стильный дропдаун для выбора задачи - фиксированная высота
           Container(
             margin: const EdgeInsets.all(20),
             padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -214,257 +209,263 @@ class _TimerScreenState extends State<TimerScreen> with TickerProviderStateMixin
             ),
           ),
           
+          // ОСНОВНОЕ ИСПРАВЛЕНИЕ: Используем Expanded для заполнения оставшегося места
           Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Статус с индикатором
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: (_isWorkTime ? workColor : breakColor).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _isWorkTime ? workColor : breakColor,
-                          boxShadow: [
-                            BoxShadow(
-                              color: (_isWorkTime ? workColor : breakColor).withOpacity(0.5),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        _isWorkTime ? widget.localizations.workTime : widget.localizations.breakTime,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: _isWorkTime ? workColor : breakColor,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 30),
-                
-                // Время с красивым шрифтом
-                Text(
-                  _formatTime(_seconds),
-                  style: TextStyle(
-                    fontSize: 64,
-                    fontWeight: FontWeight.w300,
-                    fontFamily: 'monospace',
-                    letterSpacing: 4,
-                    color: isDarkMode ? Colors.white : Color(0xFF2C3E3A),
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 30),
-                
-                // Анимированный круг с котиком
-                AnimatedBuilder(
-                  animation: _catScaleAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _isRunning ? _catScaleAnimation.value : 1.0,
-                      child: Opacity(
-                        opacity: _isRunning ? _catOpacityAnimation.value : 1.0,
-                        child: SizedBox(
-                          width: 260,
-                          height: 260,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              // Прогресс круг
-                              AnimatedBuilder(
-                                animation: _circleAnimation,
-                                builder: (context, child) {
-                                  return CustomPaint(
-                                    size: const Size(260, 260),
-                                    painter: ModernCircleTimerPainter(
-                                      progress: _circleAnimation.value,
-                                      workColor: workColor,
-                                      breakColor: breakColor,
-                                      isWorkTime: _isWorkTime,
-                                    ),
-                                  );
-                                },
-                              ),
-                              
-                              // Фоновый круг для гифки
-                              Container(
-                                width: 190,
-                                height: 190,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Colors.white.withOpacity(0.2),
-                                      Colors.white.withOpacity(0.05),
-                                    ],
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 20,
-                                      spreadRadius: 5,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              
-                              // Котик с анимацией появления
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 500),
-                                child: ClipOval(
-                                  child: Image.network(
-                                    key: ValueKey(_isWorkTime),
-                                    _isWorkTime ? _workingCatGif : _restingCatGif,
-                                    width: 170,
-                                    height: 170,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Container(
-                                        width: 170,
-                                        height: 170,
-                                        decoration: BoxDecoration(
-                                          color: (_isWorkTime ? workColor : breakColor).withOpacity(0.2),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            value: loadingProgress.expectedTotalBytes != null
-                                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                                : null,
-                                            strokeWidth: 2,
-                                            color: _isWorkTime ? workColor : breakColor,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [_isWorkTime ? workColor : breakColor, (_isWorkTime ? workColor : breakColor).withOpacity(0.6)],
-                                          ),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            _isWorkTime ? Icons.work : Icons.coffee,
-                                            size: 60,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                
-                const SizedBox(height: 40),
-                
-                // Современные кнопки
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildModernButton(
-                      onPressed: _toggleTimer,
-                      icon: _isRunning ? Icons.pause : Icons.play_arrow,
-                      label: _isRunning ? widget.localizations.pause : widget.localizations.start,
-                      color: _isRunning ? Colors.orange : Colors.green,
-                      isPrimary: true,
-                    ),
-                    const SizedBox(width: 20),
-                    _buildModernButton(
-                      onPressed: _resetTimer,
-                      icon: Icons.refresh,
-                      label: widget.localizations.reset,
-                      color: Colors.red,
-                      isPrimary: false,
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 20),
-                
-                // Текущая задача с анимацией
-                if (_selectedTask != null)
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Статус с индикатором
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          (_isWorkTime ? workColor : breakColor).withOpacity(0.15),
-                          (_isWorkTime ? workColor : breakColor).withOpacity(0.05),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(
-                        color: (_isWorkTime ? workColor : breakColor).withOpacity(0.3),
-                        width: 1,
-                      ),
+                      color: (_isWorkTime ? workColor : breakColor).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(50),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.fiber_manual_record,
-                          size: 12,
-                          color: _isWorkTime ? workColor : breakColor,
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _isWorkTime ? workColor : breakColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: (_isWorkTime ? workColor : breakColor).withOpacity(0.5),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          '${widget.localizations.currentTask}:',
+                          _isWorkTime ? widget.localizations.workTime : widget.localizations.breakTime,
                           style: TextStyle(
-                            fontSize: 14,
-                            color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _selectedTask!,
-                          style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: _isWorkTime ? workColor : breakColor,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ],
                     ),
                   ),
-              ],
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Время с красивым шрифтом
+                  Text(
+                    _formatTime(_seconds),
+                    style: TextStyle(
+                      fontSize: 56,
+                      fontWeight: FontWeight.w300,
+                      fontFamily: 'monospace',
+                      letterSpacing: 4,
+                      color: isDarkMode ? Colors.white : Color(0xFF2C3E3A),
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Анимированный круг с котиком - уменьшенный размер для тестов
+                  AnimatedBuilder(
+                    animation: _catScaleAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _isRunning ? _catScaleAnimation.value : 1.0,
+                        child: Opacity(
+                          opacity: _isRunning ? _catOpacityAnimation.value : 1.0,
+                          child: SizedBox(
+                            width: 220,
+                            height: 220,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Прогресс круг
+                                AnimatedBuilder(
+                                  animation: _circleAnimation,
+                                  builder: (context, child) {
+                                    return CustomPaint(
+                                      size: const Size(220, 220),
+                                      painter: ModernCircleTimerPainter(
+                                        progress: _circleAnimation.value,
+                                        workColor: workColor,
+                                        breakColor: breakColor,
+                                        isWorkTime: _isWorkTime,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                
+                                // Фоновый круг для гифки
+                                Container(
+                                  width: 160,
+                                  height: 160,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withOpacity(0.2),
+                                        Colors.white.withOpacity(0.05),
+                                      ],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 20,
+                                        spreadRadius: 5,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                
+                                // Котик с анимацией появления
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 500),
+                                  child: ClipOval(
+                                    child: Image.network(
+                                      key: ValueKey(_isWorkTime),
+                                      _isWorkTime ? _workingCatGif : _restingCatGif,
+                                      width: 140,
+                                      height: 140,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Container(
+                                          width: 140,
+                                          height: 140,
+                                          decoration: BoxDecoration(
+                                            color: (_isWorkTime ? workColor : breakColor).withOpacity(0.2),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                  : null,
+                                              strokeWidth: 2,
+                                              color: _isWorkTime ? workColor : breakColor,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [_isWorkTime ? workColor : breakColor, (_isWorkTime ? workColor : breakColor).withOpacity(0.6)],
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              _isWorkTime ? Icons.work : Icons.coffee,
+                                              size: 50,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Современные кнопки
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildModernButton(
+                        onPressed: _toggleTimer,
+                        icon: _isRunning ? Icons.pause : Icons.play_arrow,
+                        label: _isRunning ? widget.localizations.pause : widget.localizations.start,
+                        color: _isRunning ? Colors.orange : Colors.green,
+                        isPrimary: true,
+                      ),
+                      const SizedBox(width: 16),
+                      _buildModernButton(
+                        onPressed: _resetTimer,
+                        icon: Icons.refresh,
+                        label: widget.localizations.reset,
+                        color: Colors.red,
+                        isPrimary: false,
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Текущая задача с анимацией
+                  if (_selectedTask != null)
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            (_isWorkTime ? workColor : breakColor).withOpacity(0.15),
+                            (_isWorkTime ? workColor : breakColor).withOpacity(0.05),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: (_isWorkTime ? workColor : breakColor).withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.fiber_manual_record,
+                            size: 10,
+                            color: _isWorkTime ? workColor : breakColor,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${widget.localizations.currentTask}:',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _selectedTask!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: _isWorkTime ? workColor : breakColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  
+                  // Добавляем небольшой отступ снизу
+                  const SizedBox(height: 10),
+                ],
+              ),
             ),
           ),
         ],
@@ -482,7 +483,7 @@ class _TimerScreenState extends State<TimerScreen> with TickerProviderStateMixin
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
           gradient: isPrimary
               ? LinearGradient(
@@ -507,14 +508,15 @@ class _TimerScreenState extends State<TimerScreen> with TickerProviderStateMixin
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: isPrimary ? Colors.white : color, size: 20),
-            const SizedBox(width: 10),
+            Icon(icon, color: isPrimary ? Colors.white : color, size: 18),
+            const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
                 color: isPrimary ? Colors.white : color,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
+                fontSize: 14,
               ),
             ),
           ],
@@ -549,7 +551,7 @@ class ModernCircleTimerPainter extends CustomPainter {
         colors: [Colors.grey.withOpacity(0.1), Colors.grey.withOpacity(0.05)],
       ).createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 8;
+      ..strokeWidth = 6;
     
     canvas.drawCircle(center, radius, backgroundPaint);
     
@@ -565,7 +567,7 @@ class ModernCircleTimerPainter extends CustomPainter {
         colors: [gradientColors[0], gradientColors[1], gradientColors[0]],
       ).createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 8
+      ..strokeWidth = 6
       ..strokeCap = StrokeCap.round;
     
     final sweepAngle = 2 * pi * progress;
@@ -588,7 +590,7 @@ class ModernCircleTimerPainter extends CustomPainter {
         ..color = isWorkTime ? workColor : breakColor
         ..style = PaintingStyle.fill;
       
-      canvas.drawCircle(Offset(pointX, pointY), 6, dotPaint);
+      canvas.drawCircle(Offset(pointX, pointY), 5, dotPaint);
       
       // Внешнее свечение точки
       final glowPaint = Paint()
@@ -596,7 +598,7 @@ class ModernCircleTimerPainter extends CustomPainter {
         ..style = PaintingStyle.fill
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
       
-      canvas.drawCircle(Offset(pointX, pointY), 12, glowPaint);
+      canvas.drawCircle(Offset(pointX, pointY), 10, glowPaint);
     }
   }
 

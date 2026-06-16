@@ -139,27 +139,31 @@ class MenuWidget extends StatelessWidget {
   }
 
   Widget _buildProfileSettingsSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          localizations.profileSettings,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        localizations.profileSettings,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
-        const SizedBox(height: 8),
-        ListTile(
+      ),
+      const SizedBox(height: 8),
+      // Оборачиваем ListTile в Material для правильного отображения
+      Material(
+        color: Colors.transparent,
+        child: ListTile(
           leading: const Icon(Icons.person),
           title: Text(localizations.editProfile),
           onTap: () {
             _showProfileSettings(context);
           },
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
   Widget _buildAuthButtons(BuildContext context) {
     if (currentUser != null) {
