@@ -152,7 +152,7 @@ class MenuWidget extends StatelessWidget {
       const SizedBox(height: 8),
       // ✅ Оборачиваем в Material с прозрачным фоном
       Material(
-        color: Colors.transparent,
+        //color: Colors.transparent,
         child: ListTile(
           leading: const Icon(Icons.person),
           title: Text(localizations.editProfile),
