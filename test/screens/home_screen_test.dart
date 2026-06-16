@@ -10,127 +10,79 @@ void main() {
     username: 'TestUser',
   );
 
-  testWidgets('MainScreen displays timer initially', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MainScreen(
-            currentUser: testUser,
-            currentLanguage: 'en',
-            isDarkMode: false,
-            onUserUpdated: (user) {},
-            onLanguageChanged: (lang) {},
-            onThemeToggled: () {},
-          ),
+  Widget buildTestWidget() {
+    return MaterialApp(
+      home: Scaffold(
+        body: MainScreen(
+          currentUser: testUser,
+          currentLanguage: 'en',
+          isDarkMode: false,
+          onUserUpdated: (user) {},
+          onLanguageChanged: (lang) {},
+          onThemeToggled: () {},
         ),
       ),
     );
+  }
 
-    // Ждем завершения анимаций
-    await tester.pumpAndSettle();
+  testWidgets('MainScreen displays timer initially', (WidgetTester tester) async {
+    await tester.pumpWidget(buildTestWidget());
     
-    // Проверяем наличие таймера - ищем текст "25:00" или "Work Time"
+    // ⚡ ВАЖНО: Используем pump() вместо pumpAndSettle()
+    // Потому что анимация котика бесконечная
+    await tester.pump(const Duration(milliseconds: 500));
+    
+    // Проверяем наличие таймера
     expect(find.text('25:00'), findsOneWidget);
     
-    // Проверяем наличие кнопок Start и Reset
+    // Проверяем наличие кнопок
     expect(find.text('Start'), findsOneWidget);
     expect(find.text('Reset'), findsOneWidget);
     
-    // Проверяем нижнюю навигацию - ищем текст, а не иконки
+    // Проверяем нижнюю навигацию
     expect(find.text('Timer'), findsOneWidget);
     expect(find.text('Tasks'), findsOneWidget);
     expect(find.text('Calendar'), findsOneWidget);
   });
 
   testWidgets('MainScreen bottom navigation exists', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MainScreen(
-            currentUser: testUser,
-            currentLanguage: 'en',
-            isDarkMode: false,
-            onUserUpdated: (user) {},
-            onLanguageChanged: (lang) {},
-            onThemeToggled: () {},
-          ),
-        ),
-      ),
-    );
-
-    await tester.pumpAndSettle();
-
-    // Проверяем наличие нижней навигации по тексту
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pump(const Duration(milliseconds: 500));
+    
     expect(find.text('Timer'), findsOneWidget);
     expect(find.text('Tasks'), findsOneWidget);
     expect(find.text('Calendar'), findsOneWidget);
-    
-    // Проверяем, что BottomNavigationBar существует
     expect(find.byType(BottomNavigationBar), findsOneWidget);
   });
 
   testWidgets('Start button changes behavior on tap', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MainScreen(
-            currentUser: testUser,
-            currentLanguage: 'en',
-            isDarkMode: false,
-            onUserUpdated: (user) {},
-            onLanguageChanged: (lang) {},
-            onThemeToggled: () {},
-          ),
-        ),
-      ),
-    );
-
-    await tester.pumpAndSettle();
-
-    // Находим кнопку Start
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pump(const Duration(milliseconds: 500));
+    
     final startButton = find.text('Start');
     expect(startButton, findsOneWidget);
     
-    // Нажимаем на кнопку Start
     await tester.tap(startButton);
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1)); // Ждем обновления
+    await tester.pump(const Duration(milliseconds: 500));
     
-    // Кнопка должна измениться на Pause
     expect(find.text('Pause'), findsOneWidget);
     expect(find.text('Start'), findsNothing);
   });
 
   testWidgets('Navigation switches screens', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: MainScreen(
-            currentUser: testUser,
-            currentLanguage: 'en',
-            isDarkMode: false,
-            onUserUpdated: (user) {},
-            onLanguageChanged: (lang) {},
-            onThemeToggled: () {},
-          ),
-        ),
-      ),
-    );
-
-    await tester.pumpAndSettle();
-
-    // Нажимаем на вкладку Tasks по тексту
-    await tester.tap(find.text('Tasks'));
-    await tester.pumpAndSettle();
+    await tester.pumpWidget(buildTestWidget());
+    await tester.pump(const Duration(milliseconds: 500));
     
-    // Проверяем, что отображается экран задач - ищем поле ввода
+    // Нажимаем на вкладку Tasks
+    await tester.tap(find.text('Tasks'));
+    await tester.pump(const Duration(milliseconds: 500));
+    
     expect(find.byType(TextField), findsOneWidget);
     
     // Нажимаем на вкладку Calendar
     await tester.tap(find.text('Calendar'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
     
-    // Проверяем, что отображается календарь
     expect(find.text('Today'), findsOneWidget);
   });
 }
