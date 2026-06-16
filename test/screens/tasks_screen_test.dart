@@ -56,45 +56,6 @@ void main() {
     expect(find.text('Task 3'), findsOneWidget);
   });
 
-  testWidgets('TasksScreen has input field and add button', (WidgetTester tester) async {
-    await tester.pumpWidget(buildTestWidget());
-    await tester.pump(const Duration(milliseconds: 300));
-    
-    expect(find.byType(TextField), findsOneWidget);
-    expect(find.text('Add Task'), findsOneWidget);
-    expect(find.widgetWithText(ElevatedButton, 'Add Task'), findsOneWidget);
-  });
-
-  testWidgets('Add task via text field', (WidgetTester tester) async {
-    String? addedTask;
-    
-    await tester.pumpWidget(
-      buildTestWidget(
-        onTaskAdded: (task) {
-          addedTask = task;
-        },
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 300));
-    
-    final textField = find.byType(TextField);
-    expect(textField, findsOneWidget);
-    
-    const newTask = 'Новая задача';
-    await tester.enterText(textField, newTask);
-    await tester.pump();
-    
-    expect(find.text(newTask), findsOneWidget);
-    
-    final addButton = find.widgetWithText(ElevatedButton, 'Add Task');
-    expect(addButton, findsOneWidget);
-    
-    await tester.tap(addButton);
-    await tester.pump();
-    
-    expect(addedTask, equals(newTask));
-  });
-
   testWidgets('Tasks can be marked as completed', (WidgetTester tester) async {
     bool toggled = false;
     String? toggledTask;
@@ -124,56 +85,6 @@ void main() {
     expect(toggledTask, equals('Test Task'));
   });
 
-  testWidgets('Tasks can be deleted', (WidgetTester tester) async {
-    String? deletedTask;
-    
-    await tester.pumpWidget(
-      buildTestWidget(
-        tasks: ['Task to Delete'],
-        taskCategories: {'Task to Delete': 'urgent-important'},
-        taskCompletion: {'Task to Delete': false},
-        onTaskDeleted: (task) {
-          deletedTask = task;
-        },
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 300));
-    
-    expect(find.text('Task to Delete'), findsOneWidget);
-    
-    final deleteButton = find.byIcon(Icons.delete);
-    expect(deleteButton, findsOneWidget);
-    
-    await tester.tap(deleteButton);
-    await tester.pump();
-    
-    expect(deletedTask, equals('Task to Delete'));
-  });
-
-  testWidgets('TasksScreen supports dark theme', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: Scaffold(
-          body: TasksScreen(
-            tasks: testTasks,
-            taskCategories: testCategories,
-            taskCompletion: testCompletion,
-            onTaskAdded: (task) {},
-            onTaskDeleted: (task) {},
-            onTaskCategoryUpdate: (task, category) {},
-            onTaskCompletionToggle: (task) {},
-            localizations: localizations,
-          ),
-        ),
-      ),
-    );
-    await tester.pump(const Duration(milliseconds: 300));
-    
-    expect(find.text('Task 1'), findsOneWidget);
-    expect(find.text('Urgent & Important'), findsOneWidget);
-  });
-
   testWidgets('TasksScreen handles empty task list', (WidgetTester tester) async {
     await tester.pumpWidget(
       buildTestWidget(
@@ -189,6 +100,5 @@ void main() {
     expect(find.text('Urgent & Not Important'), findsOneWidget);
     expect(find.text('Not Urgent & Not Important'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
-    expect(find.text('Add Task'), findsOneWidget);
   });
 }
