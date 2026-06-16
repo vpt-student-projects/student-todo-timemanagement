@@ -27,19 +27,11 @@ void main() {
 
   testWidgets('MainScreen displays timer initially', (WidgetTester tester) async {
     await tester.pumpWidget(buildTestWidget());
-    
-    // ⚡ ВАЖНО: Используем pump() вместо pumpAndSettle()
-    // Потому что анимация котика бесконечная
     await tester.pump(const Duration(milliseconds: 500));
     
-    // Проверяем наличие таймера
     expect(find.text('25:00'), findsOneWidget);
-    
-    // Проверяем наличие кнопок
     expect(find.text('Start'), findsOneWidget);
     expect(find.text('Reset'), findsOneWidget);
-    
-    // Проверяем нижнюю навигацию
     expect(find.text('Timer'), findsOneWidget);
     expect(find.text('Tasks'), findsOneWidget);
     expect(find.text('Calendar'), findsOneWidget);
@@ -63,7 +55,8 @@ void main() {
     expect(startButton, findsOneWidget);
     
     await tester.tap(startButton);
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
     
     expect(find.text('Pause'), findsOneWidget);
     expect(find.text('Start'), findsNothing);
@@ -73,16 +66,12 @@ void main() {
     await tester.pumpWidget(buildTestWidget());
     await tester.pump(const Duration(milliseconds: 500));
     
-    // Нажимаем на вкладку Tasks
     await tester.tap(find.text('Tasks'));
     await tester.pump(const Duration(milliseconds: 500));
-    
     expect(find.byType(TextField), findsOneWidget);
     
-    // Нажимаем на вкладку Calendar
     await tester.tap(find.text('Calendar'));
     await tester.pump(const Duration(milliseconds: 500));
-    
     expect(find.text('Today'), findsOneWidget);
   });
 }
