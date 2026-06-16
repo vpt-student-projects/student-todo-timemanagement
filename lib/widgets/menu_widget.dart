@@ -150,7 +150,7 @@ class MenuWidget extends StatelessWidget {
         ),
       ),
       const SizedBox(height: 8),
-      // Оборачиваем ListTile в Material для правильного отображения
+      // ✅ Оборачиваем в Material с прозрачным фоном
       Material(
         color: Colors.transparent,
         child: ListTile(
